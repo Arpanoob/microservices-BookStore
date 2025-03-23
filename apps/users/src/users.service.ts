@@ -74,22 +74,32 @@ export class UsersService {
   }
 
   async update(userId: string, updateUserDto: Partial<CreateUserDto>): Promise<User> {
-    console.log(userId, updateUserDto, "okok")
+    console.log(userId, updateUserDto, "Before update");
+
     if (updateUserDto.email) {
       throw new Error("Email update is not allowed");
     }
 
-    const updatedUser = await this.userModel.findByIdAndUpdate(userId, updateUserDto, { new: true });
-    console.log(userId, updateUserDto, updatedUser, "okopopok")
-
-    if (!updatedUser) {
+    // Fetch the user first
+    const user = await this.userModel.findById(userId);
+    if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    const new_bboks = updateUserDto.OwnBooks || []
+
+    user.OwnBooks.push(...new_bboks);
+
+    // Save the updated document
+    const updatedUser = await user.save();
+    console.log(updatedUser, "After update");
 
     await this.cacheManager.set(`user_${userId}`, updatedUser, 60000);
 
     return updatedUser;
   }
+
+
 
   async delete(userId: string): Promise<{ message: string }> {
     const deletedUser = await this.userModel.findByIdAndDelete(userId);

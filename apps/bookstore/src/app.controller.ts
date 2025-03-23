@@ -1,7 +1,7 @@
 import { CreateBookStockDto } from '@app/contracts/bookStore/create-bookstore.dto';
 import { UpdateBookStockDto } from '@app/contracts/bookStore/update-bookstore.dto';
 import { Controller, BadRequestException, UnauthorizedException, NotFoundException, Logger } from '@nestjs/common';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { BookStockService } from './app.service';
 
 @Controller()
@@ -9,7 +9,7 @@ export class BookStockController {
 
     constructor(private readonly bookStockService: BookStockService) { }
 
-    @MessagePattern('bookStock.create')
+    @EventPattern('bookStock.create')
     async create(@Payload() createBookStockDto: CreateBookStockDto) {
         try {
             console.log(`Creating book stock: ${JSON.stringify(createBookStockDto)}`);
@@ -67,6 +67,7 @@ export class BookStockController {
     @MessagePattern('bookStock.checkStock')
     async checkStock(@Payload() { book, quantity }: { book: string; quantity: number }) {
         try {
+            console.log("inside bookStock : ", book, quantity)
             return await this.bookStockService.checkStock(book, quantity);
         } catch (error) {
             return this.handleException(error);
@@ -76,6 +77,7 @@ export class BookStockController {
     @MessagePattern('bookStock.decreaseStock')
     async decreaseStock(@Payload() { book, quantity }: { book: string; quantity: number }) {
         try {
+            console.log("hitten", book, quantity)
             return await this.bookStockService.decreaseStock(book, quantity);
         } catch (error) {
             return this.handleException(error);

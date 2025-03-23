@@ -13,20 +13,35 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
   imports: [ConfigModule.forRoot({
     isGlobal: true,
     envFilePath: 'apps/users/.env',
-  }),
+  })    ,
   CacheModule.register({
     store: redisStore,
     host: 'localhost',
     port: 6379,
     ttl: 600,
   }),
-    ClientsModule.register([
-      {
-        name: 'BOOKSTORE_CLIENT',
-        transport: Transport.TCP,
-        options: { port: 3003 },
+  ClientsModule.register([
+    {
+      name: 'BOOKSTORE_CLIENT',
+      transport: Transport.TCP,
+      options: { port: 3003 },
+    },
+  ]),
+  ClientsModule.register([
+    {
+      name: 'BOOKSTORE_KAFKA_CLIENT',
+      transport: Transport.KAFKA,
+      options: {
+        client: {
+          brokers: ['localhost:9092'],
+        },
+        consumer: {
+          groupId: 'bookstore-group',
+        },
       },
-    ]),
+    },
+  ])
+    ,
   JwtModule.registerAsync({
     imports: [ConfigModule],
     inject: [ConfigService],

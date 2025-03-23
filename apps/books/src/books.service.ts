@@ -1,21 +1,24 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Book } from './entities/book.entity';
 import { CreateBookDto } from '@app/contracts/books/create-book.dto';
 import { UpdateBookDto } from '@app/contracts/books/update-book.dto';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientKafka, ClientProxy } from '@nestjs/microservices';
 import { firstValueFrom } from 'rxjs';
 
 @Injectable()
-export class BooksService {
-  constructor(@InjectModel(Book.name) private bookModel: Model<Book>, @Inject('BOOKSTORE_CLIENT') private readonly bookstoreClient: ClientProxy
-  ) { }
-
+export class BooksService implements OnModuleInit {
+  constructor(@InjectModel(Book.name) private bookModel: Model<Book>,
+    @Inject('BOOKSTORE_CLIENT') private readonly bookstoreClient: ClientProxy,
+    @Inject('BOOKSTORE_KAFKA_CLIENT') private kafkaClient: ClientKafka) { }
+  async onModuleInit() {
+    await this.kafkaClient.connect();
+  }
   async create(createBookDto: CreateBookDto): Promise<Book> {
     console.log("loooooooo", createBookDto)
     const book = new this.bookModel(createBookDto);
-    firstValueFrom(this.bookstoreClient.send('bookStock.create', { book: book._id, stock: 0 }))
+    this.kafkaClient.emit('bookStock.create', { book: book._id, stock: 0 });
 
     return await book.save();
   }

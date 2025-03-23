@@ -1,6 +1,6 @@
 import { Controller, BadRequestException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { CreateUserDto } from '@app/contracts/users/create-user.dto';
 import { LoginUserDto } from '@app/contracts/users/login-user.dto';
 import { ConfigService } from '@nestjs/config';
@@ -21,6 +21,7 @@ export class UsersController {
   @MessagePattern('user.login')
   async login(@Payload() loginUserDto: LoginUserDto) {
     try {
+      console.log("hitted")
       return await this.usersService.login(loginUserDto);
     } catch (error) {
       console.log("login :", error)
@@ -40,6 +41,7 @@ export class UsersController {
   @MessagePattern('user.findOne')
   async findOne(@Payload() { userId }: { userId: string }) {
     try {
+      console.log("user : ", userId)
       console.log("Config", this.configService.get<string>('REDIS_HOST'));
       return await this.usersService.findOne(userId);
     } catch (error) {
@@ -47,9 +49,10 @@ export class UsersController {
     }
   }
 
-  @MessagePattern('user.update')
-  async update(@Payload() { userId, updateUserDto }: { userId: string; updateUserDto: Partial<CreateUserDto> }) {
+  @EventPattern('user.update')
+  async update(@Payload() Payload: { userId: string; updateUserDto: Partial<CreateUserDto> }) {
     try {
+      const { userId, updateUserDto } = Payload; 
       console.log("Updating user:", updateUserDto);
       return await this.usersService.update(userId, updateUserDto);
     } catch (error) {
@@ -67,9 +70,9 @@ export class UsersController {
   }
 
   @MessagePattern('user.logout')
-  async logout(@Payload() { id }: { id: string }) {
+  async logout(@Payload() { userId }: { userId: string }) {
     try {
-      return await this.usersService.logout(id);
+      return await this.usersService.logout(userId);
     } catch (error) {
       return this.handleException(error);
     }

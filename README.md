@@ -5,6 +5,7 @@
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
+
 ```
 bookstore
 ├─ .prettierrc
@@ -38,12 +39,19 @@ bookstore
 │  ├─ bookstore-api-gateway
 │  │  ├─ src
 │  │  │  ├─ auth
-│  │  │  │  ├─ auth-guards.ts
 │  │  │  │  ├─ auth.module.ts
 │  │  │  │  ├─ auth.service.ts
+│  │  │  │  ├─ decorators
+│  │  │  │  │  ├─ dynamic-roles.decorator.ts
+│  │  │  │  │  ├─ exclude.decorator.ts
+│  │  │  │  │  └─ roles.decorator.ts
+│  │  │  │  ├─ guards
+│  │  │  │  │  ├─ auth-guards.ts
+│  │  │  │  │  ├─ dynamic-route-authguard.ts
+│  │  │  │  │  ├─ dynamicRoute-roleGuard.ts
+│  │  │  │  │  └─ role.gaurds.ts
 │  │  │  │  └─ jwt-strategy.ts
 │  │  │  ├─ books
-│  │  │  │  ├─ books.controller.spec.ts
 │  │  │  │  ├─ books.controller.ts
 │  │  │  │  ├─ books.module copy.ts
 │  │  │  │  ├─ books.module.ts
@@ -65,11 +73,16 @@ bookstore
 │  │  │  │  │  └─ update-bookstore.dto.ts
 │  │  │  │  └─ entities
 │  │  │  │     └─ bookstore.entity.ts
-│  │  │  ├─ bookstore-api-gateway.controller.spec.ts
 │  │  │  ├─ bookstore-api-gateway.controller.ts
 │  │  │  ├─ bookstore-api-gateway.module.ts
 │  │  │  ├─ bookstore-api-gateway.service.ts
+│  │  │  ├─ interface
+│  │  │  │  └─ request.interface.ts
+│  │  │  ├─ interseptor
+│  │  │  │  └─ response.interseptor.ts
 │  │  │  ├─ main.ts
+│  │  │  ├─ middleware
+│  │  │  │  └─ response-format.middleware.ts
 │  │  │  ├─ orders
 │  │  │  │  ├─ dto
 │  │  │  │  │  ├─ create-order.dto.ts
@@ -94,10 +107,19 @@ bookstore
 │  │  │  ├─ entities
 │  │  │  │  └─ order.entity.ts
 │  │  │  ├─ main.ts
-│  │  │  ├─ orders.controller.spec.ts
 │  │  │  ├─ orders.controller.ts
 │  │  │  ├─ orders.module.ts
 │  │  │  └─ orders.service.ts
+│  │  ├─ test
+│  │  │  ├─ app.e2e-spec.ts
+│  │  │  └─ jest-e2e.json
+│  │  └─ tsconfig.app.json
+│  ├─ service-repository
+│  │  ├─ src
+│  │  │  ├─ main.ts
+│  │  │  ├─ service-repository.controller.ts
+│  │  │  ├─ service-repository.module.ts
+│  │  │  └─ service-repository.service.ts
 │  │  ├─ test
 │  │  │  ├─ app.e2e-spec.ts
 │  │  │  └─ jest-e2e.json
@@ -123,6 +145,8 @@ bookstore
 │     ├─ bookstore-api-gateway
 │     │  └─ main.js
 │     ├─ orders
+│     │  └─ main.js
+│     ├─ service-repository
 │     │  └─ main.js
 │     └─ users
 │        └─ main.js
@@ -152,3 +176,6 @@ bookstore
 └─ tsconfig.json
 
 ```
+
+
+

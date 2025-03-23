@@ -24,6 +24,32 @@ import { redisStore } from 'cache-manager-ioredis-yet';
     { name: 'BOOKSTOCK_CLIENT', transport: Transport.TCP, options: { port: 3003 } },
     { name: 'USERS_CLIENT', transport: Transport.TCP, options: { port: 3001 } },
   ]),
+  ClientsModule.register([
+    {
+      name: 'BOOKSTORE_KAFKA_CLIENT',
+      transport: Transport.KAFKA,
+      options: {
+        client: {
+          brokers: ['localhost:9092'],
+        },
+        consumer: {
+          groupId: 'bookstore-consumer',
+        },
+      },
+    },
+      {
+        name: 'USERS_KAFKA_CLIENT',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            brokers: ['localhost:9092'],
+          },
+          consumer: {
+            groupId: 'users-consumer',
+          },
+        },
+      },
+  ]),
   JwtModule.registerAsync({
     imports: [ConfigModule],
     inject: [ConfigService],

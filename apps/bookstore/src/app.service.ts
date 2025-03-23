@@ -18,11 +18,11 @@ export class BookStockService {
     }
 
     async findAll() {
-        return await this.bookStockModel.find().populate('book');
+        return await this.bookStockModel.find()
     }
 
     async findOne(id: string) {
-        const bookStock = await this.bookStockModel.findById(id).populate('book');
+        const bookStock = await this.bookStockModel.findById(id)
         if (!bookStock) throw new NotFoundException(`BookStock with ID ${id} not found`);
         return bookStock;
     }
@@ -83,12 +83,12 @@ export class BookStockService {
 
     async increaseStock(bookId: string, quantity: number) {
         console.log("insideeee,", bookId, quantity)
-        const bookStock = await this.bookStockModel.findById(bookId);
+        const bookStock = await this.bookStockModel.findOne({book:bookId});
         if (!bookStock) throw new NotFoundException(`Book with ID ${bookId} not found`);
 
         bookStock.stock += +quantity;
         const a = await bookStock.save();
-        return { message: `Stock increased by ${quantity} for book ID ${bookId}`, bookStock };
+        return { message: `Stock increased by ${quantity} for book ID ${bookId}` };
 
     }
 

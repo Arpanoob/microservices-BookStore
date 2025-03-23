@@ -1,9 +1,9 @@
-import { 
-    Body, Controller, Get, Post, Patch, Delete, Param, Res, UseGuards, Req, BadRequestException, UnauthorizedException, NotFoundException, Logger 
+import {
+    Body, Controller, Get, Post, Patch, Delete, Param, Res, UseGuards, Req, BadRequestException, UnauthorizedException, NotFoundException, Logger
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from '@app/contracts/users/create-user.dto';
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { JwtAuthGuard } from '../auth/guards/auth-guards';
 import { LoginUserDto } from '@app/contracts/users/login-user.dto';
 import { Roles } from '../auth/decorators/roles.decorator';
@@ -12,7 +12,7 @@ import { RolesGuard } from '../auth/guards/role.gaurds';
 @Controller('users')
 export class UsersController {
 
-    constructor(private userService: UsersService) {}
+    constructor(private userService: UsersService) { }
 
     @Post()
     async create(@Body() createUser: CreateUserDto) {
@@ -43,8 +43,8 @@ export class UsersController {
             return res.status(500).send(this.handleException(error));
         }
     }
-    @Roles("admin","user")
-    @UseGuards(JwtAuthGuard,RolesGuard)
+    @Roles("admin", "user")
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Get()
     async findAll() {
         try {
@@ -53,9 +53,9 @@ export class UsersController {
             return this.handleException(error);
         }
     }
-
-    @Roles("admin","user")
-    @UseGuards(JwtAuthGuard,RolesGuard)
+    //rate limmiter
+    @Roles("admin", "user")
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Get(':id')
     async findOne(@Param('id') userId: string) {
         try {
@@ -65,8 +65,8 @@ export class UsersController {
         }
     }
 
-    @Roles("admin","user")
-    @UseGuards(JwtAuthGuard,RolesGuard)
+    @Roles("admin", "user")
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Patch(':id')
     async update(@Param('id') userId: string, @Body() updateUserDto: Partial<CreateUserDto>) {
         try {
@@ -77,7 +77,7 @@ export class UsersController {
     }
 
     @Roles("admin")
-    @UseGuards(JwtAuthGuard,RolesGuard)
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Delete(':id')
     async delete(@Param('id') userId: string) {
         try {
@@ -87,8 +87,8 @@ export class UsersController {
         }
     }
 
-    @Roles("admin","user")
-    @UseGuards(JwtAuthGuard,RolesGuard)
+    @Roles("admin", "user")
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Post('logout')
     async logout(@Res() res: Response) {
         try {

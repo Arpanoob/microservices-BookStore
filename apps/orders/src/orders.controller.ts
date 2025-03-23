@@ -7,7 +7,7 @@ import { UpdateOrderDto } from '@app/contracts/orders/update-order.dto';
 @Controller()
 export class OrdersController {
 
-  constructor(private readonly ordersService: OrdersService) {}
+  constructor(private readonly ordersService: OrdersService) { }
 
   @MessagePattern('orders.create')
   async create(@Payload() createOrderDto: CreateOrderDto) {
@@ -29,7 +29,7 @@ export class OrdersController {
   }
 
   @MessagePattern('orders.findOne')
-  async findOne(@Payload() id: string) {
+  async findOne(@Payload() { id }: { id: string }) {
     try {
       return await this.ordersService.findOne(id);
     } catch (error) {
@@ -47,7 +47,7 @@ export class OrdersController {
   }
 
   @MessagePattern('orders.remove')
-  async remove(@Payload() id: string) {
+  async remove(@Payload() { id }: { id: string }) {
     try {
       return await this.ordersService.remove(id);
     } catch (error) {

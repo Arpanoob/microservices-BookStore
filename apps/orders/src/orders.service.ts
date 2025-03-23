@@ -2,7 +2,7 @@ import { Injectable, NotFoundException, BadRequestException } from '@nestjs/comm
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientKafka, ClientProxy } from '@nestjs/microservices';
 import { Inject } from '@nestjs/common';
 import { CreateOrderDto } from '@app/contracts/orders/create-order.dto';
 import { UpdateOrderDto } from '@app/contracts/orders/update-order.dto';
@@ -14,12 +14,13 @@ export class OrdersService {
   constructor(
     @InjectModel(Order.name) private readonly orderModel: Model<Order>,
     @Inject('BOOKSTOCK_CLIENT') private readonly bookStockClient: ClientProxy,
-    @Inject('USERS_CLIENT') private readonly userClient: ClientProxy
+    @Inject('USERS_CLIENT') private readonly userClient: ClientProxy,
+    @Inject('BOOKSTORE_KAFKA_CLIENT') private BookStoreKafkaClient: ClientKafka,
+    @Inject('USERS_KAFKA_CLIENT') private UserKafkaClient: ClientKafka
   ) { }
 
   async create(createOrderDto: CreateOrderDto) {
     const { userId, orders } = createOrderDto;
-    console.log("opopopoolololpoppo", createOrderDto)
 
     const stockCheckResults = await Promise.all(
       orders.map(order =>
@@ -37,25 +38,28 @@ export class OrdersService {
         this.bookStockClient.emit('bookStock.decreaseStock', { book: order.book, quantity: order.quantity })
       )
     );
-    console.log("opopopoolol1111olpoppo", createOrderDto)
 
     const newOrder = new this.orderModel(createOrderDto);
     await newOrder.save();
 
-    const or = await firstValueFrom(this.userClient.send('user.update', {
+    // const or = await firstValueFrom(this.userClient.send('user.update', {
+    //   userId,
+    //   updateUserDto: { OwnBooks: orders.map(o => ({ book: o.book, quantity: o.quantity })) }
+    // }));
+    this.UserKafkaClient.emit('user.update', {
       userId,
       updateUserDto: { OwnBooks: orders.map(o => ({ book: o.book, quantity: o.quantity })) }
-    }));
+    });
 
     return newOrder;
   }
 
   async findAll() {
-    return this.orderModel.find().populate('orders.book').populate('userId');
+    return this.orderModel.find().populate('orders.book')
   }
 
   async findOne(id: string) {
-    const order = await this.orderModel.findById(id).populate('orders.book').populate('userId');
+    const order = await this.orderModel.findById(id)//.populate('orders.book')//.populate('userId');
     if (!order) throw new NotFoundException('Order not found');
     return order;
   }

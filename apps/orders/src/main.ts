@@ -7,7 +7,10 @@ async function bootstrap() {
     transport: Transport.TCP,
     options: { port: 3002 },
   });
+
+
   await app.listen();
+
   console.log('Users Microservice is running on port 3002');
 }
 bootstrap();
