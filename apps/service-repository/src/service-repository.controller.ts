@@ -4,10 +4,19 @@ import { MessagePattern, Payload } from "@nestjs/microservices";
 
 @Controller()
 export class ServiceRegistryController {
-  constructor(private readonly registryService: ServiceRegistryService) {}
+  constructor(private readonly registryService: ServiceRegistryService) { }
 
-  @Post('register')
+  @MessagePattern('heartbeat')
+  heartbeat(@Payload('name') name: string) {
+    console.log("heart : ", name)
+
+    this.registryService.updateHeartbeat(name);
+    return { message: `💓 Heartbeat received from ${name}` };
+  }
+
+  @MessagePattern('register')
   register(@Body() service: ServiceInfo) {
+    console.log("registering : ", service)
     this.registryService.registerService(service);
     return { message: `Service ${service.name} registered successfully.` };
   }
@@ -22,13 +31,14 @@ export class ServiceRegistryController {
   async discover(@Payload() name: string) {
     console.log("opopopop", name);
     const service = this.registryService.getService(name);
+    console.log("service op : ", service)
     if (!service) {
       return { error: `Service ${name} not found.` };
     }
     return service;
   }
 
-  @Get('services')
+  @MessagePattern('services')
   getAll() {
     return this.registryService.getAllServices();
   }
